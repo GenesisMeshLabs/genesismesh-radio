@@ -1,0 +1,40 @@
+{
+  "notice": "Public deterministic test keys. Never provision these keys to deployed devices.",
+  "vectors": [
+    {
+      "name": "telemetry-negative",
+      "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "audience": "lab/site-1",
+      "now": 1700000000,
+      "wire_hex": "010101020304000000000000002a6553f13c0501ffffcfc7e198cf062b2cb9816ba2fab7578df0a7"
+    },
+    {
+      "name": "command-interval",
+      "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "audience": "lab/site-1",
+      "now": 1700000000,
+      "wire_hex": "010201020304000000000000002a6553f13c0301003c385d1577374b583019a986c360017367"
+    },
+    {
+      "name": "outcome-success",
+      "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "audience": "lab/site-1",
+      "now": 1700000000,
+      "wire_hex": "010301020304000000000000002b6553f13c0b000000000000002a00003cec4e570f57d3c0ace2f6a79269283387"
+    },
+    {
+      "name": "outcome-rejected",
+      "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "audience": "lab/site-1",
+      "now": 1700000000,
+      "wire_hex": "01030000000100000000000000016553f13c0b0000000000000063010000e8d0ef73a404c958218774dd297f43ef"
+    },
+    {
+      "name": "telemetry-minimum",
+      "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "audience": "lab/site-1",
+      "now": 1700000000,
+      "wire_hex": "0101ffffffffffffffffffffffff6553f13c05ff80000000da391f67bdd7748f640092465b864674"
+    }
+  ]
+}
