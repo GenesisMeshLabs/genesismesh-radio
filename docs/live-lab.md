@@ -55,6 +55,13 @@ For each adapter, the lab verifies authenticated telemetry, harmless duplicate
 uplinks, tampered-frame refusal, online command authorization, explicit device
 confirmation, command replay rejection, and offline grant-backed operation.
 
+The continuous-service scenario also uses real authenticated loopback HTTP while
+the owner thread runs the bridge. It tests telemetry reception during an outcome
+wait, online decisions, offline grants, duplicate request IDs, conflicting IDs,
+shutdown/restart uncertainty, and independently verified synchronized evidence.
+The combined lab currently contains 53 named checks. It still uses injected radio
+peers and does not establish RF or deployed TTS interoperability.
+
 It additionally checks:
 
 - A policy denial prevents dispatch.

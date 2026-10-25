@@ -85,9 +85,11 @@ These ran all four jobs: Linux Python 3.12, Linux Python 3.14, Windows Python 3.
 and real GenesisMesh integration. Packaging and clean-install smoke checks also
 passed on all three software jobs; C interoperability and dependency audit passed
 on their configured Linux jobs. The initial quota-blocked jobs did not execute tests.
-The implementation remains in [PR #1](https://github.com/GenesisMeshLabs/genesismesh-radio/pull/1)
-for review. Use its check results for the current commit; the local results above
-are a dated record.
+The initial implementation was merged in
+[PR #1](https://github.com/GenesisMeshLabs/genesismesh-radio/pull/1). Its post-merge
+[main workflow](https://github.com/GenesisMeshLabs/genesismesh-radio/actions/runs/40170004126)
+passed. The results above are a dated record; subsequent continuous-service and
+provisioning work has its own [validation record](service-validation.md).
 
 The next hardware pilot must validate actual modem firmware, device provisioning,
 trusted clocks/persistent counters, deployed TTS joins and downlinks, supported

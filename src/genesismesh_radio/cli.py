@@ -15,8 +15,10 @@ from pathlib import Path
 
 from .bridge import Bridge
 from .config import Config, DeviceConfig, binding, load_config, load_keys
+from .control_client import ControlError
 from .journal import Journal
 from .runtime import create_edge, create_transports, validate_runtime
+from .service_cli import CLIENT_ACTIONS, add_arguments, client_action, serve
 from .simulator import DeviceSimulator, LoopbackTransport, SimulationEdge
 
 _SAFE_ERROR_CODES = {
@@ -29,6 +31,21 @@ _SAFE_ERROR_CODES = {
     "edge_invalid_response",
     "edge_invalid_authorization",
     "edge_invalid_outcome_response",
+    "unsupported_private_permissions",
+    "unsupported_private_filesystem",
+    "unverified_private_filesystem",
+    "unsupported_config_value",
+    "credential_reference_collision",
+    "random_material_collision",
+    "source_state_unavailable",
+    "existing_state_requires_explicit_rotation_workflow",
+    "invalid_output_directory",
+    "output_parent_missing_or_unsafe",
+    "symlink_ancestor_not_allowed",
+    "output_directory_exists",
+    "output_directory_changed",
+    "provisioning_io_failure",
+    "provisioning_failed_cleanup_incomplete",
 }
 
 
@@ -51,7 +68,7 @@ def _validate_arguments(args, config):
 
 
 def _print(value):
-    print(json.dumps(value, sort_keys=True, indent=2))
+    print(json.dumps(value, sort_keys=True, indent=2), flush=True)
 
 
 def demo():
@@ -86,13 +103,18 @@ def parser():
     result = argparse.ArgumentParser(description="GenesisMesh LoRa and LoRaWAN bridge")
     sub = result.add_subparsers(dest="action", required=True)
     sub.add_parser("demo", help="run an explicitly simulated local workflow")
-    for name in ("check-config", "init-state", "status", "run", "command"):
+    add_arguments(sub)
+    for name in ("check-config", "init-state", "status", "run", "command", "serve"):
         command = sub.add_parser(name)
         command.add_argument("--config", required=True, type=Path)
-        if name == "run":
+        if name in {"run", "serve"}:
             command.add_argument(
                 "--seconds", type=float, default=0, help="0 means until interrupted"
             )
+        if name == "serve":
+            command.add_argument("--host", default="127.0.0.1")
+            command.add_argument("--port", type=int, default=17901)
+            command.add_argument("--token-env", default="GM_RADIO_CONTROL_TOKEN")
         if name == "command":
             command.add_argument("--device-id", type=int, required=True)
             command.add_argument("--interval", type=int, required=True)
@@ -109,11 +131,22 @@ def main(argv=None):
         if args.action == "demo":
             _print(demo())
             return 0
+        if args.action in CLIENT_ACTIONS:
+            _print(client_action(args))
+            return 0
+        if args.action == "provision":
+            from .provision import provision_bundle
+
+            _print(provision_bundle(Path(args.config), Path(args.output)))
+            return 0
         config = load_config(args.config)
         validate_runtime(config)
         _validate_arguments(args, config)
         keys = load_keys(config)
         identity = binding(config, keys)
+        if args.action == "serve":
+            _print(serve(args, config, keys, _print))
+            return 0
         if args.action == "check-config":
             _print(
                 {
@@ -169,6 +202,19 @@ def main(argv=None):
             return 0
     except KeyboardInterrupt:
         return 130
+    except ControlError as exc:
+        _print(
+            {
+                "error": "ControlError",
+                "code": exc.code,
+                "status_code": exc.status_code,
+                "command_id": exc.command_id,
+                "detail": "Query or retry the same request ID after an uncertain result."
+                if exc.command_id
+                else "Check the local service and control-token configuration.",
+            }
+        )
+        return 2
     except Exception as exc:
         # Dependency errors may contain broker credentials/URLs. Never print their
         # messages: sanitized type plus a narrow code is enough for the operator.
@@ -179,7 +225,9 @@ def main(argv=None):
                 "code": code
                 if isinstance(code, str) and code in _SAFE_ERROR_CODES
                 else "operation_failed",
-                "detail": "Check configuration, local service status, and the private journal.",
+                "detail": "Use a private Linux filesystem; check the template and output path."
+                if args.action == "provision"
+                else "Check configuration, local service status, and the private journal.",
             }
         )
         return 2

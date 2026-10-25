@@ -1,0 +1,36 @@
+[Unit]
+Description=GenesisMesh local radio bridge
+After=network.target
+
+[Service]
+Type=simple
+User=genesismesh-radio
+Group=genesismesh-radio
+WorkingDirectory=/var/lib/genesismesh-radio
+EnvironmentFile=/etc/genesismesh-radio/bridge.env
+ExecStart=/opt/genesismesh-radio/venv/bin/gm-radio serve --config /etc/genesismesh-radio/bridge.toml
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillMode=mixed
+UMask=0077
+StateDirectory=genesismesh-radio
+StateDirectoryMode=0700
+RuntimeDirectory=genesismesh-radio
+RuntimeDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/genesismesh-radio
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+LockPersonality=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LimitNOFILE=256
+
+[Install]
+WantedBy=multi-user.target
