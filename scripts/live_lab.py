@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "tests" / "integration"))
 from live_support import running_stack, wait_for  # noqa: E402
 from offline_verifier import verify_export  # noqa: E402
 from radio_peers import DevicePeer, RadioHarness  # noqa: E402
+from service_scenario import service_scenarios  # noqa: E402
 
 from genesismesh_radio.bridge import Bridge  # noqa: E402
 from genesismesh_radio.config import Config, DeviceConfig, binding  # noqa: E402
@@ -268,6 +269,9 @@ def main():
         with tempfile.TemporaryDirectory(prefix="gm-radio-live-") as directory:
             Path(directory).chmod(0o700)
             scenarios(Path(directory), args.edge_binary, args.verify_binary, report)
+            service_scenarios(
+                Path(directory) / "service", args.edge_binary, args.verify_binary, report, check
+            )
         report["status"] = "passed"
     except Exception as exc:
         report["status"] = "failed"

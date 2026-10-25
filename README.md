@@ -21,6 +21,11 @@ counters, a durable command journal and the same GenesisMesh local API. The firs
 command updates a bounded sampling interval. [Transport contracts](docs/transports.md)
 describe the exact interfaces and payload-budget requirements.
 
+The [continuous local service](docs/service.md) receives telemetry while operators
+submit commands and inspect outcomes through an authenticated loopback API.
+[Fresh-device provisioning](docs/provisioning.md) generates private configuration
+and key bundles; it never enrolls, flashes, rotates or resets existing devices.
+
 ## Quick software demo
 
 Python 3.12+:
@@ -58,12 +63,25 @@ gm-radio status --config examples/meshtastic.toml
 gm-radio run --config examples/meshtastic.toml
 ```
 
-`command` owns the receive loop while waiting for that operation's result. `run`
-continuously receives telemetry/outcomes and retries pending evidence reports.
-They are **mutually exclusive**: one process owns the journal. Stop `run` before
-using `command` or `status`. A repeated `--request-id <uuid>` inspects the original
-request without redispatch. An interrupted operation remains uncertain after
-restart; reconcile it instead of issuing another physical command automatically.
+These direct commands are **mutually exclusive**: one process owns the journal.
+`command` receives while waiting for its result; `run` receives continuously and
+retries pending evidence reports. Stop `run` before direct `command` or `status`.
+
+For continuous operation, configure a distinct `GM_RADIO_CONTROL_TOKEN`, use
+`serve` instead of `run`, and contact it through the service client commands:
+
+```sh
+gm-radio serve --config examples/meshtastic.toml
+gm-radio service-health
+gm-radio service-status
+gm-radio service-command --device-id 1 --interval 60 --request-id 11111111-1111-4111-8111-111111111111
+gm-radio service-result --request-id 11111111-1111-4111-8111-111111111111
+```
+
+Run the client commands in another local terminal. Use a new UUID for a new
+operation and retain it before sending. Reusing that ID inspects/retries the
+original request without redispatch. An HTTP timeout or interrupted operation
+remains uncertain; do not issue another physical command with a new UUID.
 
 ## What the evidence means
 

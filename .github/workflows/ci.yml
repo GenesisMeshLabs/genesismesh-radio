@@ -44,6 +44,7 @@ jobs:
           if [ "$RUNNER_OS" = "Windows" ]; then wheel_python=wheel-env/Scripts/python.exe; else wheel_python=wheel-env/bin/python; fi
           "$wheel_python" -m pip install dist/*.whl
           "$wheel_python" -m genesismesh_radio demo
+          "$wheel_python" -c "from genesismesh_radio.service import ControlService; from genesismesh_radio.provision import provision_bundle"
       - name: Firmware C interoperability
         if: runner.os == 'Linux'
         run: python firmware/tests/conformance.py
