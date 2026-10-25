@@ -2,9 +2,10 @@
 
 Status: portable implementation and local verification complete after merging
 the continuous service in PR #2. Hosted results are tracked on the implementation
-pull request. Hardware has not been selected.
+pull request. The subsequent [RAK4631 pilot](rak4631-pilot.md) selects the first
+board and adds separate experimental peripheral/diagnostic crates.
 
-No board has been selected. This increment builds an allocation-free `no_std`
+At the time of this increment no board had been selected. It builds an allocation-free `no_std`
 library, a host interoperability harness and cross-build checks. A compiler target
 passing does not establish support for a board's radio, flash, clock or bootloader.
 

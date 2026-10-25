@@ -1,0 +1,44 @@
+[package]
+name = "rak4631-bringup"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.99"
+publish = false
+description = "Read-only RAK4631 WisBlock bench diagnostic, with no radio transmission"
+
+[features]
+default = []
+board = ["dep:cortex-m", "dep:cortex-m-rt", "dep:embedded-hal", "dep:nrf52840-hal", "dep:rtt-target", "dep:genesismesh-radio-device", "dep:genesismesh-radio-wisblock"]
+
+[[bin]]
+name = "rak4631-bringup"
+path = "src/main.rs"
+required-features = ["board"]
+test = false
+bench = false
+
+[dependencies]
+cortex-m = { version = "=0.7.7", features = ["critical-section-single-core"], optional = true }
+cortex-m-rt = { version = "=0.7.7", features = ["set-vtor"], optional = true }
+embedded-hal = { version = "=1.0.0", optional = true }
+nrf52840-hal = { version = "=0.19.0", default-features = false, features = ["rt"], optional = true }
+rtt-target = { version = "=0.6.2", optional = true }
+genesismesh-radio-device = { path = "../genesismesh-radio-device", optional = true }
+genesismesh-radio-wisblock = { path = "../genesismesh-radio-wisblock", optional = true }
+
+[dev-dependencies]
+serde_json = "1.0"
+
+[profile.release]
+codegen-units = 1
+debug = 2
+lto = true
+opt-level = "s"
+panic = "abort"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

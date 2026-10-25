@@ -121,3 +121,39 @@ jobs:
         run: |
           cargo +1.99.0 install cargo-audit --version 0.22.2 --locked
           cargo audit --file firmware/rust/genesismesh-radio-device/Cargo.lock
+
+  rak4631:
+    name: RAK4631 peripherals and diagnostic image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/target/rak4631
+      CARGO_INCREMENTAL: '0'
+      RUSTUP_TOOLCHAIN: '1.99.0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Install pinned compiler and the selected MCU target
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy --target thumbv7em-none-eabihf
+          rustup toolchain install 1.85.0 --profile minimal
+      - name: Check the peripheral library's minimum compiler
+        run: cargo +1.85.0 check --locked --lib --manifest-path firmware/rust/genesismesh-radio-wisblock/Cargo.toml
+      - name: Peripheral fault models, board image and reserved-memory checks
+        run: bash scripts/check-rak4631.sh
+      - name: Audit locked peripheral and board dependencies
+        run: |
+          cargo install cargo-audit --version 0.22.2 --locked
+          cargo audit --file firmware/rust/genesismesh-radio-wisblock/Cargo.lock
+          cargo audit --file firmware/rust/rak4631-bringup/Cargo.lock
+      - name: Save diagnostic build for review (not hardware validation)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rak4631-read-only-diagnostic
+          if-no-files-found: error
+          path: |
+            target/rak4631/thumbv7em-none-eabihf/release/rak4631-bringup
+            target/rak4631/image-check.json
+            firmware/rust/rak4631-bringup/memory-layout.json
