@@ -1,0 +1,12 @@
+{
+  "board": "RAK4631",
+  "description": "RAK19007 base, stock Arduino S140 6.1.1 application layout",
+  "target": "thumbv7em-none-eabihf",
+  "flash_origin": 155648,
+  "flash_length": 815104,
+  "ram_origin": 536895488,
+  "ram_length": 237568,
+  "radio_transmission": false,
+  "hardware_tested": false,
+  "reference": "https://github.com/RAKWireless/RAK-nRF52-Arduino/blob/cc4b1bf417541ae4e4b8afb96b4f4e7ff438f355/cores/nRF5/linker/nrf52840_s140_v6.ld"
+}

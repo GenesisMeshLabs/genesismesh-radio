@@ -104,6 +104,11 @@ Six ARM/RISC-V library builds provide architecture coverage; concrete boards sti
 need flash, time, radio-stack and bootloader integration. The C codec remains
 available for C/C++ integrations.
 
+The selected [RAK4631/EU868 pilot](docs/rak4631-pilot.md) adds experimental FRAM
+and RTC adapters plus a linked, read-only board diagnostic. CI checks its ELF
+against the stock application memory window. Peripheral fault models run on the
+host; the diagnostic has no radio stack and has not been flashed or RF-tested.
+
 See [architecture and recovery](docs/architecture.md), [wire protocol](docs/protocol.md),
 and [portable firmware codec](firmware/README.md). The codec supports Arduino/ESP-IDF
 and bare-metal integration through a platform crypto callback; it is not complete
