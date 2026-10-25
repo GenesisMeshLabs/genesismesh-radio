@@ -1,5 +1,9 @@
 # Constrained-device codec
 
+An allocation-free [Rust device core](rust/genesismesh-radio-device/README.md) now
+implements the same wire profile plus local command handling and recovery. The C
+codec below remains available for C/C++ and vendor-SDK integration.
+
 This directory contains an allocation-free C99 codec for the application profile
 in [the protocol specification](../docs/protocol.md). The Python bridge and the
 C codec share deterministic vectors and are tested against each other using

@@ -80,8 +80,44 @@ jobs:
         run: |
           rustup toolchain install 1.99.0 --profile minimal
           cargo +1.99.0 build --locked --manifest-path .upstream/sdk-rust/Cargo.toml -p genesis-mesh-edge -p genesis-mesh-verify
+          cargo +1.99.0 build --locked --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml --example device_peer
       - name: Exercise all adapters, offline grants, revocation and evidence verification
         run: |
           export GM_EDGE_BINARY="$GITHUB_WORKSPACE/.upstream/sdk-rust/target/debug/genesis-mesh-edge"
           export GM_VERIFY_BINARY="$GITHUB_WORKSPACE/.upstream/sdk-rust/target/debug/genesis-mesh-verify"
+          export GM_RUST_DEVICE_BINARY="$GITHUB_WORKSPACE/firmware/rust/genesismesh-radio-device/target/debug/examples/device_peer"
           bash scripts/run-live-lab.sh
+
+  rust-device:
+    name: Rust device core and cross-builds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_TARGET_DIR: target/radio-device
+      CARGO_INCREMENTAL: '0'
+      RUSTUP_TOOLCHAIN: '1.99.0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+      - name: Install pinned toolchains and bare-metal targets
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy --target thumbv6m-none-eabi --target thumbv7em-none-eabi --target thumbv7em-none-eabihf --target thumbv8m.main-none-eabihf --target riscv32imc-unknown-none-elf --target riscv32imac-unknown-none-elf
+          rustup toolchain install 1.85.0 --profile minimal
+      - run: cargo +1.99.0 fmt --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml -- --check
+      - run: cargo +1.99.0 test --locked --all-targets --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml
+      - run: cargo +1.99.0 clippy --locked --all-targets --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml -- -D warnings
+      - run: cargo +1.85.0 check --locked --lib --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml
+      - name: Build allocation-free library for six MCU targets
+        run: |
+          for target in thumbv6m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf thumbv8m.main-none-eabihf riscv32imc-unknown-none-elf riscv32imac-unknown-none-elf; do
+            cargo +1.99.0 build --locked --release --lib --target "$target" --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml
+          done
+      - name: Python, C and Rust interoperability
+        run: python firmware/tests/rust_conformance.py
+      - name: Audit the locked device dependencies
+        run: |
+          cargo +1.99.0 install cargo-audit --version 0.22.2 --locked
+          cargo audit --file firmware/rust/genesismesh-radio-device/Cargo.lock

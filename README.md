@@ -96,6 +96,14 @@ never execution success. Missing confirmation is explicit uncertainty. The bridg
 uses shared-key MAC authentication, so a device report is not an independently
 verifiable device signature. HMAC supplies no confidentiality for raw LoRa.
 
+The [Rust device core](firmware/rust/genesismesh-radio-device/README.md) implements
+the same v1 wire profile plus authenticated snapshots, replay counters, local
+command bounds and conservative recovery around device configuration changes.
+It is allocation-free `no_std` code with storage, clock, actuator and radio traits.
+Six ARM/RISC-V library builds provide architecture coverage; concrete boards still
+need flash, time, radio-stack and bootloader integration. The C codec remains
+available for C/C++ integrations.
+
 See [architecture and recovery](docs/architecture.md), [wire protocol](docs/protocol.md),
 and [portable firmware codec](firmware/README.md). The codec supports Arduino/ESP-IDF
 and bare-metal integration through a platform crypto callback; it is not complete

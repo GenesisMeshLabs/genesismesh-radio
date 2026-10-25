@@ -15,3 +15,9 @@ Review the applicable licenses before redistributing a combined application.
   https://www.openssl.org/source/license.html
 
 AMQTT is a test-only broker. It is never required by a production bridge installation.
+
+The optional Rust device crate has its own committed Cargo lockfile. RustCrypto
+`hmac` 0.12.1 and `sha2` 0.10.9 use MIT OR Apache-2.0 licensing; their `subtle`
+dependency uses BSD-3-Clause. Host-only `serde_json` and `hex` use MIT OR Apache-2.0.
+These declarations come from the locked packages' Cargo metadata. Review the full
+transitive inventory and applicable terms before distributing a combined firmware.
