@@ -1,0 +1,23 @@
+[bridge]
+audience = "site-7"
+state_path = "../.local/lora-serial.db"
+
+[edge]
+base_url = "http://127.0.0.1:17900"
+token_env = "GM_RADIO_EDGE_TOKEN"
+timeout = 10
+
+[transports.uart]
+kind = "lora_serial"
+port = "/dev/ttyUSB0"
+baudrate = 115200
+
+[[devices]]
+device_id = 1
+route = "sensor-1"
+transport = "uart"
+resource_id = "edge:site-7/sensor-1"
+key_env = "GM_RADIO_DEVICE_1_KEY"
+min_interval = 5
+max_interval = 3600
+max_payload = 51

@@ -1,0 +1,23 @@
+[bridge]
+audience = "site-7"
+state_path = "../.local/meshtastic.db"
+
+[edge]
+unix_socket = "/run/genesis-mesh-edge/agent.sock"
+timeout = 10
+
+[transports.mesh]
+kind = "meshtastic"
+port = "/dev/ttyUSB0"
+channel = 1
+app_port = 256
+
+[[devices]]
+device_id = 1
+route = "!aabbccdd"
+transport = "mesh"
+resource_id = "edge:site-7/sensor-1"
+key_env = "GM_RADIO_DEVICE_1_KEY"
+min_interval = 5
+max_interval = 3600
+max_payload = 51

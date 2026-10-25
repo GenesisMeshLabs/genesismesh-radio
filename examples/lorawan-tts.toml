@@ -1,0 +1,32 @@
+[bridge]
+audience = "site-7"
+state_path = "../.local/lorawan-tts.db"
+
+[edge]
+unix_socket = "/run/genesis-mesh-edge/agent.sock"
+timeout = 10
+
+[transports.lorawan]
+kind = "tts"
+host = "eu1.cloud.thethings.network"
+port = 8883
+application = "replace-application@ttn"
+username = "replace-application@ttn"
+password_env = "GM_RADIO_TTS_API_KEY"
+f_port = 10
+tls = true
+
+[transports.lorawan.device_euis]
+sensor-1 = "0011223344556677"
+
+[[devices]]
+device_id = 1
+route = "sensor-1"
+transport = "lorawan"
+resource_id = "edge:site-7/sensor-1"
+key_env = "GM_RADIO_DEVICE_1_KEY"
+min_interval = 5
+max_interval = 3600
+# Confirm your region, data rate and MAC overhead leave this application budget.
+# US915 DR0 does not support this protocol profile.
+max_payload = 51

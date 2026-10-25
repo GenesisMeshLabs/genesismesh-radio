@@ -1,0 +1,86 @@
+name: Radio integration
+
+on:
+  pull_request:
+  push:
+    branches: [main, 'feat/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radio-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  software:
+    name: Software (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, python: '3.12'}
+          - {os: ubuntu-24.04, python: '3.14'}
+          - {os: windows-latest, python: '3.12'}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev,meshtastic,integration]"
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m pytest -q --cov=genesismesh_radio --cov-fail-under=80
+      - run: python -m genesismesh_radio demo
+      - run: python -m build
+      - name: Clean wheel install and CLI smoke
+        shell: bash
+        run: |
+          python -m venv wheel-env
+          if [ "$RUNNER_OS" = "Windows" ]; then wheel_python=wheel-env/Scripts/python.exe; else wheel_python=wheel-env/bin/python; fi
+          "$wheel_python" -m pip install dist/*.whl
+          "$wheel_python" -m genesismesh_radio demo
+      - name: Firmware C interoperability
+        if: runner.os == 'Linux'
+        run: python firmware/tests/conformance.py
+      - name: Dependency audit
+        if: matrix.os == 'ubuntu-24.04' && matrix.python == '3.12'
+        run: python -m pip_audit --progress-spinner off
+
+  live-genesis:
+    name: Real GenesisMesh offline integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_TERM_COLOR: always
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: GenesisMeshLabs/genesismesh
+          ref: 9e4d5c01e6ba7a22e73c17388796ec274f73a2fc
+          path: .upstream/core
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: GenesisMeshLabs/sdk-rust
+          ref: e554ca482a3ef4bc1e7a2ef205ac1d537daa169d
+          path: .upstream/sdk-rust
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev,meshtastic]" -e .upstream/core
+      - name: Build the pinned edge agent and independent verifier
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo +1.99.0 build --locked --manifest-path .upstream/sdk-rust/Cargo.toml -p genesis-mesh-edge -p genesis-mesh-verify
+      - name: Exercise all adapters, offline grants, revocation and evidence verification
+        run: |
+          export GM_EDGE_BINARY="$GITHUB_WORKSPACE/.upstream/sdk-rust/target/debug/genesis-mesh-edge"
+          export GM_VERIFY_BINARY="$GITHUB_WORKSPACE/.upstream/sdk-rust/target/debug/genesis-mesh-verify"
+          bash scripts/run-live-lab.sh

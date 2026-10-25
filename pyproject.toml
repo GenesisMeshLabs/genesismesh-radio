@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "genesismesh-radio"
+version = "0.1.0a1"
+description = "Experimental governed LoRa and LoRaWAN bridge for GenesisMesh edge agents"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["httpx==0.28.1", "paho-mqtt==2.1.0", "pyserial==3.5"]
+
+[project.optional-dependencies]
+meshtastic = ["meshtastic==2.7.11"]
+integration = ["amqtt==0.11.3"]
+dev = ["pytest>=8.3,<10", "pytest-cov>=6,<8", "hypothesis>=6.120,<7", "ruff>=0.11,<1", "build>=1.2,<2", "pip-audit>=2.8,<3"]
+
+[project.scripts]
+gm-radio = "genesismesh_radio.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/genesismesh_radio"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["integration: requires disposable external services or Linux tooling"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.coverage.run]
+source = ["genesismesh_radio"]
+branch = true
