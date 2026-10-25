@@ -154,7 +154,11 @@ def test_tts_payload_binding(path, value):
         parse_event(data)
 
 
-@pytest.mark.parametrize("event", [b"[]", b"null", b"\xff", b"{", b"{}" * 40000])
+@pytest.mark.parametrize(
+    "event",
+    [b"[]", b"null", b"\xff", b"{", b"{}" * 40000],
+    ids=["array", "null", "invalid-utf8", "truncated", "oversize"],
+)
 def test_tts_rejects_bad_json(event):
     with pytest.raises(AdapterError):
         parse_event(event)
