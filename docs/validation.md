@@ -16,6 +16,9 @@ tested scope; it does not establish RF coverage, hardware or production readines
 | Clean wheel installation and CLI demo | Passed |
 | Installed dependency audit | No known vulnerabilities after updating the isolated test environment's pip |
 | Independent review | 18 controller/persistence regression tests passed; findings fixed |
+| Hosted Ubuntu 24.04, Python 3.12 and 3.14 | 361 passed on each version; at least 90% coverage |
+| Hosted Windows, Python 3.12 | 360 passed; 1 POSIX-only PTY skip; 90.39% coverage |
+| Hosted real GenesisMesh integration | 38 checks passed in both PR and push workflows |
 
 The full suite includes real PySerial loopback/PTY, actual Meshtastic 2.7.11 packet
 encoding, and Paho 2.1.0 sockets against a disposable local AMQTT 0.11.3 broker.
@@ -57,6 +60,9 @@ polling, ambiguous sends and reports, complete configuration preflight before I/
 and the minimum budget needed for a 46-byte application outcome. Python 3.14
 verification exposed reliance on interpreter-specific JSON recursion limits;
 responses now have explicit depth/item limits and reject numeric overflow.
+Hosted Windows testing also exposed pytest's generated 80 KB test name exceeding
+the operating system's environment-variable limit. Explicit short test IDs fix
+the setup error while retaining the full oversized malformed payload.
 
 The permission contract is explicitly **dispatch authorization**. `report_by` is
 not a grant-expiry value. A queued device does not independently verify a
@@ -72,7 +78,13 @@ Linux runners are fixed to Ubuntu 24.04; the live lab builds with Rust 1.99.0.
 
 The initial private-repository jobs could not start because its GitHub Actions
 allowance was exhausted. The repository was made public at the maintainer's request
-and hosted checks are being rerun; those initial jobs did not execute tests.
+and both workflows passed on `24d3053e52144a269709ce0747f603779f8cbcb8`:
+[PR run](https://github.com/GenesisMeshLabs/genesismesh-radio/actions/runs/40169087730)
+and [push run](https://github.com/GenesisMeshLabs/genesismesh-radio/actions/runs/40169084170).
+These ran all four jobs: Linux Python 3.12, Linux Python 3.14, Windows Python 3.12,
+and real GenesisMesh integration. Packaging and clean-install smoke checks also
+passed on all three software jobs; C interoperability and dependency audit passed
+on their configured Linux jobs. The initial quota-blocked jobs did not execute tests.
 The implementation remains in [PR #1](https://github.com/GenesisMeshLabs/genesismesh-radio/pull/1)
 for review. Use its check results for the current commit; the local results above
 are a dated record.

@@ -1,9 +1,8 @@
 # LoRa and LoRaWAN integration plan
 
-Status: software implementation and local verification complete; PR #1 is open.
-The repository is public and hosted CI is being rerun after the private-repository
-Actions allowance was exhausted. This is an experimental integration, not a claim
-of production or RF validation.
+Status: software implementation, local verification and hosted CI complete;
+PR #1 is open for maintainer review. The repository is public. This is an
+experimental integration, not a claim of production or RF validation.
 
 ## Outcome
 
@@ -70,7 +69,7 @@ outcomes live in the bridge journal; governance evidence contains metadata/diges
 - [x] Complete packaging and clean-install checks.
 - [x] Configure implementation PR CI gates for Linux, Windows and real GenesisMesh.
 - [x] Submit the implementation and local validation record in PR #1.
-- [ ] Complete hosted CI for the public repository.
+- [x] Complete hosted CI for the public repository; results in [validation](validation.md).
 
 ## Review-driven decisions
 
