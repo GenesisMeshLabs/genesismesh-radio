@@ -70,12 +70,12 @@ Windows Python 3.12, packaging and clean-install smoke tests, C interoperability
 dependency audit, and the real-service lab against the immutable revisions above.
 Linux runners are fixed to Ubuntu 24.04; the live lab builds with Rust 1.99.0.
 
-Hosted CI has **not run successfully**. GitHub refused to start the initial jobs
-because recent account payments failed or the spending limit must be increased.
-This is an account-level execution block, not a passing check or a test failure.
+The initial private-repository jobs could not start because its GitHub Actions
+allowance was exhausted. The repository was made public at the maintainer's request
+and hosted checks are being rerun; those initial jobs did not execute tests.
 The implementation remains in [PR #1](https://github.com/GenesisMeshLabs/genesismesh-radio/pull/1)
-for review. After Actions access is restored, use its check results for the current
-commit; the local results above are a dated record.
+for review. Use its check results for the current commit; the local results above
+are a dated record.
 
 The next hardware pilot must validate actual modem firmware, device provisioning,
 trusted clocks/persistent counters, deployed TTS joins and downlinks, supported

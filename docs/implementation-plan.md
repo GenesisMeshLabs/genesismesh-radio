@@ -1,8 +1,9 @@
 # LoRa and LoRaWAN integration plan
 
 Status: software implementation and local verification complete; PR #1 is open.
-Hosted CI is blocked before execution by GitHub's account payment/spending-limit
-check. This is an experimental integration, not a claim of production or RF validation.
+The repository is public and hosted CI is being rerun after the private-repository
+Actions allowance was exhausted. This is an experimental integration, not a claim
+of production or RF validation.
 
 ## Outcome
 
@@ -65,11 +66,11 @@ outcomes live in the bridge journal; governance evidence contains metadata/diges
 - [x] Add C interoperability client and transport configuration examples.
 - [x] Exercise both transport families against disposable real GenesisMesh services.
 - [x] Independent security/code review and fixes.
-- [x] Create private GitHub repository.
+- [x] Create GitHub repository and make it public at the maintainer's request.
 - [x] Complete packaging and clean-install checks.
 - [x] Configure implementation PR CI gates for Linux, Windows and real GenesisMesh.
 - [x] Submit the implementation and local validation record in PR #1.
-- [ ] Complete hosted CI after GitHub Actions account access is restored.
+- [ ] Complete hosted CI for the public repository.
 
 ## Review-driven decisions
 

@@ -1,7 +1,7 @@
 # Dependency notices
 
-This private prototype does not declare a redistribution license for its own code.
-Review licensing before publishing or redistributing a combined application.
+This experimental repository does not declare a redistribution license for its own code.
+Review the applicable licenses before redistributing a combined application.
 
 - Meshtastic Python 2.7.11 (optional adapter dependency): GPL-3.0-only.
   https://github.com/meshtastic/python/blob/master/LICENSE
