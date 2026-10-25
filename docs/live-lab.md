@@ -24,6 +24,8 @@ adapter tests exercise local MQTT and serial interfaces where available.
   with its declared Python dependencies installed in the test environment.
 - Built `genesis-mesh-edge` and `genesis-mesh-verify` 1.8.1 executables. Build from a selected
   SDK revision with its lockfile; the lab reports the executable's version.
+- Rust 1.99.0 and the built `device_peer` host example from this repository.
+  It uses disposable keys and simulated hardware, not a deployed device.
 
 For example, in a dedicated environment:
 
@@ -32,14 +34,18 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -e '.[dev]' 'genesis-mesh==1.8.1'
 CARGO_TARGET_DIR=/tmp/gm-radio-target cargo build --locked \
   --manifest-path /path/to/sdk-rust/Cargo.toml -p genesis-mesh-edge -p genesis-mesh-verify
+CARGO_TARGET_DIR=/tmp/gm-radio-device-target cargo +1.99.0 build --locked \
+  --manifest-path firmware/rust/genesismesh-radio-device/Cargo.toml --example device_peer
 GM_RADIO_PYTHON="$PWD/.venv/bin/python" \
 GM_EDGE_BINARY=/tmp/gm-radio-target/debug/genesis-mesh-edge \
+GM_RUST_DEVICE_BINARY=/tmp/gm-radio-device-target/debug/examples/device_peer \
   bash scripts/run-live-lab.sh
 ```
 
 If testing the core checkout, also set `GM_CORE_SOURCE=/path/to/genesismesh`.
 The verifier defaults to the executable beside the edge agent; override it with
 `GM_VERIFY_BINARY` or `--verify-binary` when it lives elsewhere.
+Set `GM_RUST_DEVICE_BINARY` or `--rust-device-binary` to the built host peer.
 The shell wrapper sets `PYTHONDONTWRITEBYTECODE=1` so imports do not create files
 in that source checkout. Build output belongs in a separate target directory.
 
@@ -59,8 +65,12 @@ The continuous-service scenario also uses real authenticated loopback HTTP while
 the owner thread runs the bridge. It tests telemetry reception during an outcome
 wait, online decisions, offline grants, duplicate request IDs, conflicting IDs,
 shutdown/restart uncertainty, and independently verified synchronized evidence.
-The combined lab currently contains 53 named checks. It still uses injected radio
-peers and does not establish RF or deployed TTS interoperability.
+The Rust-device scenario adds the real Rust engine with simulated memory/storage
+and actuation, tests independently enforced device limits and replay refusal after
+reopening its snapshot, and verifies online/offline evidence end to end. Reopening
+that in-process snapshot does not simulate loss of volatile memory or prove board
+flash durability. The combined lab currently contains 66 named checks. It still
+uses injected radio peers and does not establish RF or deployed TTS interoperability.
 
 It additionally checks:
 

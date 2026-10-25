@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "tests" / "integration"))
 from live_support import running_stack, wait_for  # noqa: E402
 from offline_verifier import verify_export  # noqa: E402
 from radio_peers import DevicePeer, RadioHarness  # noqa: E402
+from rust_device_scenario import rust_device_scenarios  # noqa: E402
 from service_scenario import service_scenarios  # noqa: E402
 
 from genesismesh_radio.bridge import Bridge  # noqa: E402
@@ -238,6 +239,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--edge-binary", default=os.environ.get("GM_EDGE_BINARY"))
     parser.add_argument("--verify-binary", default=os.environ.get("GM_VERIFY_BINARY"))
+    parser.add_argument("--rust-device-binary", default=os.environ.get("GM_RUST_DEVICE_BINARY"))
     parser.add_argument("--report", type=Path, default=ROOT / "artifacts" / "live-lab.json")
     args = parser.parse_args()
     if platform.system() != "Linux":
@@ -248,6 +250,8 @@ def main():
         args.verify_binary = str(Path(args.edge_binary).with_name("genesis-mesh-verify"))
     if not Path(args.verify_binary).is_file():
         parser.error("--verify-binary must name a built genesis-mesh-verify executable")
+    if not args.rust_device_binary or not Path(args.rust_device_binary).is_file():
+        parser.error("--rust-device-binary must name the built Rust device_peer host example")
     version = subprocess.run(
         [args.edge_binary, "--version"], capture_output=True, text=True, check=True, timeout=10
     ).stdout.strip()
@@ -262,6 +266,7 @@ def main():
         "python": platform.python_version(),
         "transport_execution": "real adapters with injected SDK/MQTT/UART peers",
         "hardware_rf_tested": False,
+        "rust_device_storage": "simulated in-process memory; engine reopen is not a board reset",
         "checks": [],
     }
     started = time.monotonic()
@@ -271,6 +276,14 @@ def main():
             scenarios(Path(directory), args.edge_binary, args.verify_binary, report)
             service_scenarios(
                 Path(directory) / "service", args.edge_binary, args.verify_binary, report, check
+            )
+            rust_device_scenarios(
+                Path(directory) / "rust-device",
+                args.edge_binary,
+                args.verify_binary,
+                args.rust_device_binary,
+                report,
+                check,
             )
         report["status"] = "passed"
     except Exception as exc:
