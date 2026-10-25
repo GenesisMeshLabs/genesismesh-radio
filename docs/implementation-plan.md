@@ -1,7 +1,8 @@
 # LoRa and LoRaWAN integration plan
 
-Status: software implementation complete; final CI verification in progress. This is an experimental integration, not a
-claim of production or RF validation.
+Status: software implementation and local verification complete; PR #1 is open.
+Hosted CI is blocked before execution by GitHub's account payment/spending-limit
+check. This is an experimental integration, not a claim of production or RF validation.
 
 ## Outcome
 
@@ -67,6 +68,8 @@ outcomes live in the bridge journal; governance evidence contains metadata/diges
 - [x] Create private GitHub repository.
 - [x] Complete packaging and clean-install checks.
 - [x] Configure implementation PR CI gates for Linux, Windows and real GenesisMesh.
+- [x] Submit the implementation and local validation record in PR #1.
+- [ ] Complete hosted CI after GitHub Actions account access is restored.
 
 ## Review-driven decisions
 

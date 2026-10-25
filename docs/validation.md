@@ -5,7 +5,9 @@ tested scope; it does not establish RF coverage, hardware or production readines
 
 | Check | Result |
 | --- | --- |
-| Full Python suite, WSL Ubuntu 24.04 / Python 3.12.3 | 359 passed; 90% combined statement/branch coverage |
+| Full Python suite, WSL Ubuntu 24.04 / Python 3.12.3 | 361 passed; 90% combined statement/branch coverage |
+| Full Python suite, WSL Ubuntu 24.04 / Python 3.14.5 | 361 passed |
+| Windows Python 3.14.3, tests not requiring Hypothesis | 197 passed |
 | Real GenesisMesh integration | 38 checks passed, all three radio adapter paths |
 | Independent Rust evidence verifier | Original export accepted; altered export rejected |
 | Portable C/OpenSSL interoperability | 7 suites passed, including 300 randomized round trips, golden vectors and mutation checks |
@@ -20,9 +22,10 @@ encoding, and Paho 2.1.0 sockets against a disposable local AMQTT 0.11.3 broker.
 The external broker dependency emits one Python 3.12 `crypt` deprecation warning.
 There were no skipped tests in the full Linux run.
 
-Local Windows Python 3.14 ran the bridge/config/CLI and edge contract checks.
+Local Windows Python 3.14 ran the bridge, configuration, CLI, edge contract, runtime,
+and review regression checks.
 Application Control blocks Hypothesis's native extension on this host; its property
-tests passed in WSL. Windows CI uses an independent hosted runner. Linux-only PTY
+tests passed in WSL. Windows CI is configured for an independent hosted runner. Linux-only PTY
 checks are explicitly inapplicable on Windows, rather than claimed as passed there.
 
 ## Real-service evidence
@@ -39,6 +42,9 @@ checks are explicitly inapplicable on Windows, rather than claimed as passed the
   service or physical radio was used.
 - The lab reports the selected core source version and commit separately from
   installed distribution metadata, which can be stale when importing a checkout.
+- A separate fresh Python 3.12 environment and clean archive of the pinned core
+  passed the exact CI dependency installation, `pip check`, and all 38 live checks;
+  core source and distribution metadata both reported 1.8.1 in that run.
 
 Reproduce with [the live lab instructions](live-lab.md). Its machine-readable report
 is generated at `artifacts/live-lab.json` and deliberately excluded from Git.
@@ -48,7 +54,9 @@ is generated at `artifacts/live-lab.json` and deliberately excluded from Git.
 Review caught and tests now cover identity-bound journals, strict device IDs,
 replay/counter preservation on failed admission, bounded storage, pending-only
 polling, ambiguous sends and reports, complete configuration preflight before I/O,
-and the minimum budget needed for a 46-byte application outcome.
+and the minimum budget needed for a 46-byte application outcome. Python 3.14
+verification exposed reliance on interpreter-specific JSON recursion limits;
+responses now have explicit depth/item limits and reject numeric overflow.
 
 The permission contract is explicitly **dispatch authorization**. `report_by` is
 not a grant-expiry value. A queued device does not independently verify a
@@ -57,10 +65,17 @@ bridge-observed claims, never represented as device digital signatures.
 
 ## CI and remaining validation
 
-The pull request's `Radio integration` workflow runs Linux Python 3.12/3.14,
+The pull request's `Radio integration` workflow is configured for Linux Python 3.12/3.14,
 Windows Python 3.12, packaging and clean-install smoke tests, C interoperability,
 dependency audit, and the real-service lab against the immutable revisions above.
-Use its check results for the current commit; local results above are a dated record.
+Linux runners are fixed to Ubuntu 24.04; the live lab builds with Rust 1.99.0.
+
+Hosted CI has **not run successfully**. GitHub refused to start the initial jobs
+because recent account payments failed or the spending limit must be increased.
+This is an account-level execution block, not a passing check or a test failure.
+The implementation remains in [PR #1](https://github.com/GenesisMeshLabs/genesismesh-radio/pull/1)
+for review. After Actions access is restored, use its check results for the current
+commit; the local results above are a dated record.
 
 The next hardware pilot must validate actual modem firmware, device provisioning,
 trusted clocks/persistent counters, deployed TTS joins and downlinks, supported

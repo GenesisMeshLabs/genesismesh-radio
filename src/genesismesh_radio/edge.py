@@ -82,6 +82,23 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
+def _bounded_shape(value: Any) -> None:
+    """Use explicit limits, independent of the interpreter's JSON recursion limit."""
+    pending = [(value, 0)]
+    visited = 0
+    while pending:
+        item, depth = pending.pop()
+        visited += 1
+        if depth > 64 or visited > 10_000:
+            raise ValueError("JSON structure limit")
+        if isinstance(item, dict):
+            pending.extend((child, depth + 1) for child in item.values())
+        elif isinstance(item, list):
+            pending.extend((child, depth + 1) for child in item)
+        elif isinstance(item, float) and not math.isfinite(item):
+            raise ValueError("nonfinite number")
+
+
 class EdgeClient:
     """Connect through a Unix socket or a bearer-authenticated literal loopback IP.
 
@@ -159,6 +176,7 @@ class EdgeClient:
                     object_pairs_hook=_unique_object,
                     parse_constant=lambda _: (_ for _ in ()).throw(ValueError("nonfinite")),
                 )
+                _bounded_shape(parsed)
         except httpx.HTTPError as exc:
             raise EdgeError("edge_transport_error") from exc
         except (ValueError, UnicodeError, RecursionError) as exc:

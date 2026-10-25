@@ -226,3 +226,15 @@ def test_deep_json_is_a_sanitized_contract_error():
         pytest.raises(EdgeError, match="edge_invalid_json"),
     ):
         edge.status()
+
+
+@pytest.mark.parametrize("payload", [b'{"number":1e999}', b'{"number":-1e999}'])
+def test_numeric_overflow_is_refused(payload):
+    with (
+        EdgeClient(
+            token="local",
+            transport=httpx.MockTransport(lambda _: httpx.Response(200, content=payload)),
+        ) as edge,
+        pytest.raises(EdgeError, match="edge_invalid_json"),
+    ):
+        edge.status()

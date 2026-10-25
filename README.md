@@ -105,6 +105,6 @@ then verifies exported evidence with both Python and the standalone Rust verifie
 It uses generated test credentials and never accesses an existing production NA.
 Pinned source revisions and measured results are in [validation](docs/validation.md).
 
-CI runs Python 3.12/3.14 on Linux, Python 3.12 on Windows, packaging, C interoperability,
-dependency audit and the real GenesisMesh integration. Dependencies and distribution
+CI is configured for Python 3.12/3.14 on Linux, Python 3.12 on Windows, packaging,
+C interoperability, dependency audit and the real GenesisMesh integration. Dependencies and distribution
 considerations are listed in [third-party notices](THIRD_PARTY_NOTICES.md).
