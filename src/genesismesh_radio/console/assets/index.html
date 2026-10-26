@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenesisMesh home lab</title><link rel="stylesheet" href="/assets/style.css"><script defer src="/assets/app.js"></script></head>
+<body><main>
+<header><p class="eyebrow">GENESISMESH / HOME PILOT</p><h1>Your home, under local control.</h1>
+<p class="intro">Observe the network, request a bounded change, and follow its outcome.</p>
+<div class="tags"><span id="mode">Connecting to console</span><span id="identity">Signed out</span></div></header>
+<p id="notice" role="status" aria-live="polite">Sign in to view this lab.</p>
+<section id="login-panel" class="card narrow"><h2>Operator sign in</h2><p>Use the account created on your home server.</p>
+<form id="login-form"><label>Username<input name="username" autocomplete="username" maxlength="32" required></label>
+<label>Password<input name="password" type="password" autocomplete="current-password" maxlength="128" required></label>
+<button type="submit">Sign in</button></form></section>
+<div id="workspace" hidden>
+<div class="toolbar"><h2>Home network</h2><div><button id="refresh" class="secondary">Refresh</button><button id="logout" class="secondary">Sign out</button></div></div>
+<section class="grid" aria-label="Network observations">
+<article class="card"><p class="eyebrow">BRIDGE PROCESS</p><h3 id="health">Unknown</h3><p>Process health is separate from radio delivery.</p></article>
+<article class="card"><p class="eyebrow">AUTHENTICATED EVENTS</p><h3 id="events">—</h3><p id="freshness">No sensor observation received.</p></article>
+<article class="card"><p class="eyebrow">TRUST AND CONNECTIVITY</p><h3>Checked per operation</h3><p>Current authority and adapter connectivity are not independently probed by this screen.</p></article></section>
+<section class="card"><h2>Sensor observations</h2><div id="observations" class="stack"></div><p class="muted">Values retain their protocol metric IDs and units. A shared-key MAC is not an independent device signature.</p></section>
+<div class="grid two"><section class="card"><h2>Request a sampling change</h2><p id="permission">Only local operator accounts can submit. GenesisMesh checks dispatch permission at the bridge.</p>
+<form id="command-form"><label>Device<select id="device" required></select></label>
+<label>Sampling interval in seconds<input id="interval" type="number" min="5" max="3600" value="60" step="1" required></label>
+<label>Command freshness in seconds<input id="ttl" type="number" min="3" max="300" value="60" step="1" required></label>
+<button id="submit-command" type="submit">Submit request</button></form>
+<button id="new-request" class="secondary" disabled>Start another request</button>
+<p class="muted">The request ID is saved before submission. Reconnect checks the original request; it never resends automatically.</p></section>
+<section class="card"><h2>Current request</h2><dl><dt>Request ID</dt><dd id="request-id">No request yet</dd><dt>Dispatch authorization</dt><dd id="authorization-id">—</dd><dt>Permission source</dt><dd id="permission-source">—</dd><dt>Device outcome</dt><dd id="outcome">—</dd><dt>Evidence reporting</dt><dd id="report">—</dd></dl><p id="request-detail">Submit a request to follow its result.</p><button id="lookup" class="secondary">Check original request</button></section></div>
+<section class="card"><h2>Recent commands</h2><div id="commands" class="stack"></div></section>
+</div><footer>Home pilot · Local console accounts admit access to the bridge. They are separate from GenesisMesh node identities.</footer>
+</main></body></html>

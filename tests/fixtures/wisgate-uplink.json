@@ -1,0 +1,16 @@
+{
+  "adr": true,
+  "applicationID": "1",
+  "applicationName": "home-pilot",
+  "data": "ZGlzcG9zYWJsZS10ZWxlbWV0cnk=",
+  "data_encode": "base64",
+  "devEUI": "0011223344556677",
+  "deviceName": "test-sensor",
+  "fCnt": 7,
+  "fPort": 10,
+  "rxInfo": [
+    {"gatewayID": "8899aabbccddeeff", "loRaSNR": 5.5, "rssi": -70}
+  ],
+  "timestamp": 1708395729,
+  "txInfo": {"dr": 0, "frequency": 868100000}
+}

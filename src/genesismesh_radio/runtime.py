@@ -17,6 +17,20 @@ from .adapters.tts import (
     validate_device,
     validate_f_port,
 )
+from .adapters.wisgate import (
+    WisGateMqttTransport,
+    validate_application_id,
+    validate_device_euis,
+)
+from .adapters.wisgate import (
+    validate_application as validate_wisgate_application,
+)
+from .adapters.wisgate import (
+    validate_connection as validate_wisgate_connection,
+)
+from .adapters.wisgate import (
+    validate_f_port as validate_wisgate_f_port,
+)
 from .config import Config, ConfigError, validate
 from .edge import EdgeClient
 
@@ -29,6 +43,22 @@ _TRANSPORT_KEYS = {
         "kind",
         "host",
         "application",
+        "device_euis",
+        "username",
+        "password_env",
+        "port",
+        "f_port",
+        "queue_size",
+        "tls",
+        "ca_file",
+        "connect_timeout",
+        "publish_timeout",
+    },
+    "wisgate": {
+        "kind",
+        "host",
+        "application",
+        "application_id",
         "device_euis",
         "username",
         "password_env",
@@ -136,6 +166,29 @@ def _tts_settings(settings, routes):
     _timeout(settings.get("publish_timeout", 5))
 
 
+def _wisgate_settings(settings, routes):
+    required = {"host", "application", "application_id", "device_euis", "username"}
+    if required - settings.keys():
+        raise ConfigError("missing_wisgate_setting")
+    validate_wisgate_application(settings["application"])
+    validate_application_id(settings["application_id"])
+    euis = validate_device_euis(settings["device_euis"])
+    if set(euis) != set(routes):
+        raise ConfigError("wisgate_device_route_mismatch")
+    validate_wisgate_connection(
+        settings["host"],
+        settings.get("port", 8883),
+        settings["username"],
+        tls=settings.get("tls", True),
+        connect_timeout=settings.get("connect_timeout", 10),
+        publish_timeout=settings.get("publish_timeout", 5),
+    )
+    validate_wisgate_f_port(settings.get("f_port", 10))
+    if "ca_file" in settings:
+        _string(settings["ca_file"], "invalid_mqtt_ca_file")
+    _env_reference(settings.get("password_env", "GM_WISGATE_MQTT_PASSWORD"))
+
+
 def validate_runtime(config: Config) -> None:
     """Validate every transport and edge setting before any service is opened.
 
@@ -160,7 +213,10 @@ def validate_runtime(config: Config) -> None:
         routes = [device.route for device in devices]
         try:
             for device in devices:
-                validate_budget(device.max_payload, {"meshtastic": 200, "tts": 242}.get(kind, 255))
+                validate_budget(
+                    device.max_payload,
+                    {"meshtastic": 200, "tts": 242, "wisgate": 242}.get(kind, 255),
+                )
             if kind in {"meshtastic", "lora_serial"}:
                 _string(settings.get("port"), "serial_port_required")
             if kind == "meshtastic":
@@ -172,9 +228,11 @@ def validate_runtime(config: Config) -> None:
                 for route in routes:
                     validate_route(route)
                 _integer(settings.get("baudrate", 115200), "invalid_baudrate", 1200, 4000000)
-            else:
+            elif kind == "tts":
                 _tts_settings(settings, routes)
-            if kind in {"meshtastic", "tts"}:
+            else:
+                _wisgate_settings(settings, routes)
+            if kind in {"meshtastic", "tts", "wisgate"}:
                 _integer(settings.get("queue_size", 128), "invalid_queue_size", 1, 65536)
         except AdapterError as exc:
             raise ConfigError("invalid_transport_setting") from exc
@@ -197,8 +255,9 @@ def create_transports(config: Config, stack: ExitStack):
     # Resolve all credentials before constructing even the first adapter.
     passwords = {}
     for name, settings in config.transports.items():
-        if settings["kind"] == "tts":
-            password = os.environ.get(settings.get("password_env", "GM_TTS_API_KEY"))
+        if settings["kind"] in {"tts", "wisgate"}:
+            default = "GM_TTS_API_KEY" if settings["kind"] == "tts" else "GM_WISGATE_MQTT_PASSWORD"
+            password = os.environ.get(settings.get("password_env", default))
             if not password:
                 raise ConfigError("missing_mqtt_password_environment")
             passwords[name] = password
@@ -216,6 +275,9 @@ def create_transports(config: Config, stack: ExitStack):
         elif kind == "tts":
             settings.pop("password_env", None)
             adapter = TtsMqttTransport(max_payload=budget, password=passwords[name], **settings)
+        elif kind == "wisgate":
+            settings.pop("password_env", None)
+            adapter = WisGateMqttTransport(max_payload=budget, password=passwords[name], **settings)
         else:
             raise ConfigError("unsupported_transport_kind")
         stack.callback(adapter.close)

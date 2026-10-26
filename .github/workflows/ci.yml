@@ -31,10 +31,11 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e ".[dev,meshtastic,integration]"
+      - run: python -m pip install -e ".[dev,meshtastic,integration,console]"
       - run: python -m ruff check .
       - run: python -m ruff format --check .
       - run: python -m pytest -q --cov=genesismesh_radio --cov-fail-under=80
+      - run: node --test tests/frontend/console.test.cjs
       - run: python -m genesismesh_radio demo
       - run: python -m build
       - name: Clean wheel install and CLI smoke
@@ -75,7 +76,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e ".[dev,meshtastic]" -e .upstream/core
+      - run: python -m pip install -e ".[dev,meshtastic,console]" -e .upstream/core
       - name: Build the pinned edge agent and independent verifier
         run: |
           rustup toolchain install 1.99.0 --profile minimal
@@ -87,6 +88,15 @@ jobs:
           export GM_VERIFY_BINARY="$GITHUB_WORKSPACE/.upstream/sdk-rust/target/debug/genesis-mesh-verify"
           export GM_RUST_DEVICE_BINARY="$GITHUB_WORKSPACE/firmware/rust/genesismesh-radio-device/target/debug/examples/device_peer"
           bash scripts/run-live-lab.sh
+          export GM_CORE_SOURCE="$GITHUB_WORKSPACE/.upstream/core"
+          python scripts/home_pilot_lab.py --console-checks --report artifacts/home-pilot-ci.json
+          GM_HOME_PILOT_INTEGRATION=1 python -m pytest -q tests/test_home_pilot_lab.py
+      - name: Save redacted home pilot software evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: home-pilot-software-evidence
+          if-no-files-found: error
+          path: artifacts/home-pilot-ci.json
 
   rust-device:
     name: Rust device core and cross-builds

@@ -1,0 +1,36 @@
+[bridge]
+audience = "home-pilot"
+state_path = "../.local/lorawan-wisgate.db"
+
+[edge]
+unix_socket = "/run/genesis-mesh-edge/agent.sock"
+timeout = 10
+
+[transports.lorawan]
+kind = "wisgate"
+# Local broker used by the gateway's built-in LNS Generic MQTT integration.
+# This is an example host, not a discovered gateway or an existing deployment.
+host = "broker.home"
+port = 8883
+application = "home-pilot"
+application_id = "1"
+username = "genesismesh-radio"
+password_env = "GM_WISGATE_MQTT_PASSWORD"
+f_port = 10
+tls = true
+# For a local CA, supply a path outside Git. Certificate + hostname validation stays on.
+# ca_file = "/home/operator/.config/genesismesh-radio/mqtt-ca.crt"
+
+[transports.lorawan.device_euis]
+sensor-1 = "0011223344556677"
+
+[[devices]]
+device_id = 1
+route = "sensor-1"
+transport = "lorawan"
+resource_id = "edge:home-pilot/sensor-1"
+key_env = "GM_RADIO_DEVICE_1_KEY"
+min_interval = 5
+max_interval = 3600
+# Check EU868 data rate, radio settings and actual MAC overhead on arrival.
+max_payload = 51
