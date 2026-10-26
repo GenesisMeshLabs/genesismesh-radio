@@ -20,10 +20,11 @@ adapter tests exercise local MQTT and serial interfaces where available.
 ## Requirements
 
 - Linux or WSL, Python 3.12+, and this package's development dependencies.
-- GenesisMesh core 1.8.1 installed, or a checkout supplied through `GM_CORE_SOURCE`
-  with its declared Python dependencies installed in the test environment.
-- Built `genesis-mesh-edge` and `genesis-mesh-verify` 1.8.1 executables. Build from a selected
-  SDK revision with its lockfile; the lab reports the executable's version.
+- The GenesisMesh core release the install command below names, or a checkout supplied
+  through `GM_CORE_SOURCE` with its declared Python dependencies installed in the test
+  environment.
+- Built `genesis-mesh-edge` and `genesis-mesh-verify` executables of the same release. Build
+  from that release's SDK revision with its lockfile; the lab reports the executable's version.
 - Rust 1.99.0 and the built `device_peer` host example from this repository.
   It uses disposable keys and simulated hardware, not a deployed device.
 
