@@ -40,6 +40,18 @@ def bridge_session(path):
     return data
 
 
+def listen_host(settings, requested):
+    """Separate browser origin from an explicit WSL NAT bind without trusting proxy headers."""
+    from .console.app import ConsoleSettings
+
+    parsed = urlsplit(settings.origin)
+    if requested is None:
+        return parsed.hostname
+    # Reuse the same literal/private IPv4 and HTTPS-or-explicit-loopback rules.
+    ConsoleSettings(f"{parsed.scheme}://{requested}:{parsed.port}", settings.development_loopback)
+    return requested
+
+
 @contextmanager
 def demo_bridge():
     """Synthetic authority and RF, deliberately labelled; never opens a radio device."""
@@ -109,6 +121,7 @@ def parser():
             command.add_argument("--role", choices=["observer", "operator"], required=True)
         if name in {"serve", "demo"}:
             command.add_argument("--origin", default="http://127.0.0.1:17902")
+            command.add_argument("--listen-host", help="explicit private IPv4 bind for WSL NAT")
             command.add_argument("--development-loopback", action="store_true")
             command.add_argument("--ssl-certfile", type=Path)
             command.add_argument("--ssl-keyfile", type=Path)
@@ -174,6 +187,7 @@ def main(argv=None):
                 backend = stack.enter_context(ControlClient(url, token))
             settings = ConsoleSettings(args.origin, args.development_loopback, mode)
             parsed = urlsplit(settings.origin)
+            host = listen_host(settings, args.listen_host)
             if parsed.scheme == "https":
                 if not args.ssl_certfile or not args.ssl_keyfile:
                     raise ValueError("https_requires_certificate_and_private_key")
@@ -184,7 +198,7 @@ def main(argv=None):
                 raise ValueError("tls_files_require_https_origin")
             config = uvicorn.Config(
                 create_app(settings, store, backend),
-                host=parsed.hostname,
+                host=host,
                 port=parsed.port,
                 ssl_certfile=str(args.ssl_certfile) if args.ssl_certfile else None,
                 ssl_keyfile=str(args.ssl_keyfile) if args.ssl_keyfile else None,

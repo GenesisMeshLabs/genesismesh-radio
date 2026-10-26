@@ -9,7 +9,7 @@ pytest.importorskip("starlette")
 
 from genesismesh_radio.console import store as storage  # noqa: E402
 from genesismesh_radio.console.store import OperatorStore  # noqa: E402
-from genesismesh_radio.console_cli import bridge_session, main  # noqa: E402
+from genesismesh_radio.console_cli import bridge_session, listen_host, main  # noqa: E402
 
 pytestmark = pytest.mark.skipif(os.name != "posix", reason="private CLI state requires POSIX")
 
@@ -76,6 +76,7 @@ def test_cli_never_binds_before_tls_or_loopback_validation(tmp_path, monkeypatch
         ["--origin", "http://192.168.1.2:17902", "--development-loopback"],
         ["--control-url", "http://192.168.1.2:17901", "--development-loopback"],
         ["--seconds", "nan", "--development-loopback"],
+        ["--listen-host", "192.168.1.2", "--development-loopback"],
     ):
         assert main(["serve", "--state", str(state), *extra]) == 2
         assert "console_operation_failed" in capsys.readouterr().err
@@ -125,3 +126,15 @@ def test_private_state_rejects_symlinks_and_shared_mount(tmp_path, monkeypatch):
     )
     with pytest.raises(ValueError, match="unsupported_private_filesystem"):
         OperatorStore(state)
+
+
+def test_nat_bind_keeps_exact_https_browser_origin_and_refuses_broad_bind():
+    from genesismesh_radio.console.app import ConsoleSettings
+
+    settings = ConsoleSettings("https://192.168.1.50:17902")
+    assert listen_host(settings, "172.20.1.5") == "172.20.1.5"
+    assert settings.origin == "https://192.168.1.50:17902"
+    assert listen_host(settings, None) == "192.168.1.50"
+    for value in ("0.0.0.0", "8.8.8.8", "example.org", "127.0.0.1:17903"):
+        with pytest.raises(ValueError):
+            listen_host(settings, value)

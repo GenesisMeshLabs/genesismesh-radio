@@ -87,6 +87,27 @@ automatically. WSL networking must be deliberately configured and verified for
 the chosen Windows mode. Until actual Android connectivity, lock/reopen and
 certificate trust pass, phone acceptance remains pending.
 
+For WSL NAT, the browser origin is the Windows PC's home LAN address while the
+listener binds the WSL guest's private IPv4 address. Add an explicit bind:
+
+```sh
+gm-radio-console serve --state "$HOME/gm-home-console/operators.db" \
+  --origin https://192.168.1.50:17902 --listen-host 172.20.1.5 \
+  --ssl-certfile /private/tls/home.crt --ssl-keyfile /private/tls/home.key
+```
+
+Replace both sample addresses. The certificate must match the browser origin,
+and exact Host/Origin checks still use that origin, not the guest bind. The
+listener accepts only an explicit private/loopback IPv4 address; wildcard and
+public binds are refused. This does not trust `X-Forwarded-*` headers. Windows
+TCP forwarding and a narrow firewall rule are separate deployment steps; follow
+[Microsoft's WSL networking guide](https://learn.microsoft.com/en-us/windows/wsl/networking)
+and verify them with the actual phone when ready. The guest address can change
+after restart, so startup/reboot acceptance must include the forwarding target.
+TCP forwarding can make clients share an apparent source address and therefore
+share the console's login-rate limit. No forwarding or firewall rule is applied
+by this CLI.
+
 Use one console worker and one loopback bridge owner. Restarting the console
 invalidates browser sessions. Local operator administration is through the CLI;
 the phone interface does not grant authority administration rights.
