@@ -17,6 +17,21 @@ POSIX = pytest.mark.skipif(
 )
 
 
+def _patch_provision_os(monkeypatch, **functions):
+    """Replace os functions for the provisioning module only.
+
+    Patching ``genesismesh_radio.provision.os.fstat`` patches the os module itself,
+    which pytest also calls while capturing output.
+    """
+    from genesismesh_radio import provision
+
+    class ProvisionOS:
+        def __getattr__(self, name):
+            return functions[name] if name in functions else getattr(os, name)
+
+    monkeypatch.setattr(provision, "os", ProvisionOS())
+
+
 @pytest.fixture
 def template(tmp_path):
     path = tmp_path / "template.toml"
@@ -368,7 +383,7 @@ def test_partial_write_failure_cleans_only_own_bundle(template, tmp_path, monkey
             raise OSError("sensitive-driver-error")
         return real_write(descriptor, data)
 
-    monkeypatch.setattr("genesismesh_radio.provision.os.write", fail_second_write)
+    _patch_provision_os(monkeypatch, write=fail_second_write)
     with pytest.raises(ProvisionError, match="^provisioning_io_failure$"):
         provision_bundle(template, tmp_path / "bundle")
     assert not (tmp_path / "bundle").exists()
@@ -393,7 +408,7 @@ def test_permission_verification_failure_leaves_no_bundle(template, tmp_path, mo
         result[0] = result[0] | 0o077
         return os.stat_result(result)
 
-    monkeypatch.setattr("genesismesh_radio.provision.os.fstat", wrong_permissions)
+    _patch_provision_os(monkeypatch, fstat=wrong_permissions)
     with pytest.raises(ProvisionError, match="unsupported_private_permissions"):
         provision_bundle(template, tmp_path / "bundle")
     assert not (tmp_path / "bundle").exists()
@@ -432,7 +447,7 @@ def test_file_stat_failure_closes_descriptor_and_retains_unverified_file(
             raise OSError("file stat failed")
         return result
 
-    monkeypatch.setattr("genesismesh_radio.provision.os.fstat", fail_file_stat)
+    _patch_provision_os(monkeypatch, fstat=fail_file_stat)
     destination = tmp_path / "bundle"
     with pytest.raises(ProvisionError, match="provisioning_failed_cleanup_incomplete") as error:
         provision_bundle(template, destination)
