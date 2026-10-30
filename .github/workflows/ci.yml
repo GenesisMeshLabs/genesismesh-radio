@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: GenesisMeshLabs/genesismesh
-          ref: 9e4d5c01e6ba7a22e73c17388796ec274f73a2fc
+          ref: 1485b42e84a9e6b40240f3d366a492aca8aab44f
           path: .upstream/core
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
