@@ -33,7 +33,7 @@ checks are explicitly inapplicable on Windows, rather than claimed as passed the
 
 ## Real-service evidence
 
-- Core source: `9e4d5c01e6ba7a22e73c17388796ec274f73a2fc` (1.8.1).
+- Core source: `1485b42e84a9e6b40240f3d366a492aca8aab44f` (1.8.1).
 - Rust SDK/edge/verifier source: `e554ca482a3ef4bc1e7a2ef205ac1d537daa169d` (1.8.1).
 - Disposable Network Authority, SQLite evidence store, freshly generated identities,
   authenticated Unix socket, and a newly built Linux edge agent/verifier.
