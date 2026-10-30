@@ -13,10 +13,12 @@ dependencies = ["httpx==0.28.1", "paho-mqtt==2.1.0", "pyserial==3.5"]
 [project.optional-dependencies]
 meshtastic = ["meshtastic==2.7.11"]
 integration = ["amqtt==0.11.3"]
+console = ["starlette==1.10.0", "uvicorn==0.54.0"]
 dev = ["pytest>=8.3,<10", "pytest-cov>=6,<8", "hypothesis>=6.120,<7", "ruff>=0.11,<1", "build>=1.2,<2", "pip-audit>=2.8,<3"]
 
 [project.scripts]
 gm-radio = "genesismesh_radio.cli:main"
+gm-radio-console = "genesismesh_radio.console_cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/genesismesh_radio"]

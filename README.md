@@ -28,6 +28,14 @@ and key bundles; it never enrolls, flashes, rotates or resets existing devices.
 
 ## Quick software demo
 
+For the fixed home pilot, start with the [disposable real-service rehearsal](docs/home-pilot-lab.md),
+the optional [authenticated browser console](docs/home-console.md), and the
+[local WisGate LoRaWAN adapter](docs/local-lorawan.md). Windows/WSL hosts the
+permanent services; Android is the intended local console, while Mac/iPhone can
+join and leave. Actual phone/LAN and RF acceptance remain pending. The
+[simulated proposal helper](docs/proposals.md) prepares bounded sampling requests
+for review without granting permission or dispatching them.
+
 Python 3.12+:
 
 ```sh

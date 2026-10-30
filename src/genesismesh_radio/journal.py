@@ -266,3 +266,20 @@ class Journal:
             event["details"] = json.loads(event.pop("details_json"))
             rows.append(event)
         return list(reversed(rows))
+
+    def latest_telemetry(self):
+        """At most 100 recent device observations; omit raw radio frames."""
+        rows = self.db.execute("""
+            SELECT device_id,received_at,details_json FROM events
+            WHERE event_id IN (SELECT MAX(event_id) FROM events
+              WHERE kind='telemetry' GROUP BY device_id)
+            ORDER BY event_id DESC LIMIT 100
+        """)
+        return [
+            {
+                "device_id": row["device_id"],
+                "received_at": row["received_at"],
+                "details": json.loads(row["details_json"]),
+            }
+            for row in rows
+        ]

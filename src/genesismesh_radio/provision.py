@@ -167,9 +167,12 @@ def _toml(config: Config) -> str:
 def _references(config: Config) -> set[str]:
     references = {config.edge.get("token_env", "GM_EDGE_TOKEN")}
     references.update(
-        settings.get("password_env", "GM_TTS_API_KEY")
+        settings.get(
+            "password_env",
+            "GM_TTS_API_KEY" if settings["kind"] == "tts" else "GM_WISGATE_MQTT_PASSWORD",
+        )
         for settings in config.transports.values()
-        if settings["kind"] == "tts"
+        if settings["kind"] in {"tts", "wisgate"}
     )
     if CONTROL_TOKEN_ENV in references or references.union({CONTROL_TOKEN_ENV}).intersection(
         device.key_env for device in config.devices
@@ -199,12 +202,14 @@ def _profile(config, device, key):
     metadata = {"kind": kind}
     if kind == "meshtastic":
         metadata.update(channel=settings.get("channel", 0), app_port=settings.get("app_port", 256))
-    elif kind == "tts":
+    elif kind in {"tts", "wisgate"}:
         metadata.update(
             application=settings["application"],
             dev_eui=settings["device_euis"][device.route],
             f_port=settings.get("f_port", 10),
         )
+        if kind == "wisgate":
+            metadata["application_id"] = settings["application_id"]
     else:
         metadata["baudrate"] = settings.get("baudrate", 115200)
     return {
@@ -323,7 +328,7 @@ def provision_bundle(config_path: Path, output_dir: Path) -> dict:
             "instructions": [
                 "Use only with fresh devices; this bundle is not a rotation or recovery tool.",
                 "Provision each secret device profile through a trusted local device workflow.",
-                "Load bridge.env privately and supply existing edge/TTS credentials separately.",
+                "Load bridge.env privately and supply existing edge/MQTT credentials separately.",
                 "Initialize bridge state explicitly before starting the service.",
                 "Keep profiles and bridge.env out of Git, logs and shared storage.",
             ],

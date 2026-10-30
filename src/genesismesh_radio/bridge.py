@@ -315,6 +315,17 @@ class Bridge:
         return {
             "audience": self.config.audience,
             "commands": self.journal.commands(),
+            "devices": [
+                {
+                    "device_id": d.device_id,
+                    "resource_id": d.resource_id,
+                    "transport": d.transport,
+                    "min_interval": d.min_interval,
+                    "max_interval": d.max_interval,
+                }
+                for d in self.config.devices
+            ],
+            "latest_telemetry": self.journal.latest_telemetry(),
             "event_count": self.journal.event_count(),
             "command_count": self.journal.command_count(),
             "rejected_frames": self.rejected_frames,

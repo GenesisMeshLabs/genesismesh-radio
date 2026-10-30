@@ -9,6 +9,10 @@ Review the applicable licenses before redistributing a combined application.
   https://github.com/eclipse-paho/paho.mqtt.python
 - PySerial 3.5: BSD-3-Clause. https://github.com/pyserial/pyserial
 - HTTPX 0.28.1: BSD-3-Clause. https://github.com/encode/httpx
+- Starlette 1.10.0 (optional operator console): BSD-3-Clause.
+  https://github.com/Kludex/starlette
+- Uvicorn 0.54.0 (optional HTTPS console server): BSD-3-Clause.
+  https://github.com/Kludex/uvicorn
 - mbedTLS is supplied by the embedded platform, not vendored here.
   https://github.com/Mbed-TLS/mbedtls
 - OpenSSL is used by host interoperability tests, not included in the firmware codec.
