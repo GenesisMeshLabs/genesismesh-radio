@@ -44,7 +44,9 @@ def test_runtime_binary_has_exact_version_and_file_hash(tmp_path, monkeypatch):
 
     def run(args, **kwargs):
         calls.append((args, kwargs))
-        return subprocess.CompletedProcess(args, 0, stdout=f"genesis-mesh-edge {lab.RUNTIME_VERSION}\n")
+        return subprocess.CompletedProcess(
+            args, 0, stdout=f"genesis-mesh-edge {lab.RUNTIME_VERSION}\n"
+        )
 
     monkeypatch.setattr(lab.subprocess, "run", run)
     assert lab.binary_info(binary, "genesis-mesh-edge") == {
@@ -76,7 +78,9 @@ def test_runtime_binary_version_drift_and_empty_file_are_refused(tmp_path, monke
 def test_modified_or_unpinned_core_source_is_refused(tmp_path, monkeypatch, dirty, revision):
     package = tmp_path / "genesis_mesh"
     package.mkdir()
-    (tmp_path / "pyproject.toml").write_text(f'[project]\nname="genesis-mesh"\nversion="{lab.RUNTIME_VERSION}"\n')
+    (tmp_path / "pyproject.toml").write_text(
+        f'[project]\nname="genesis-mesh"\nversion="{lab.RUNTIME_VERSION}"\n'
+    )
     monkeypatch.setitem(
         sys.modules,
         "genesis_mesh",
