@@ -25,9 +25,12 @@ sys.path.insert(0, str(ROOT / "tests" / "integration"))
 if os.environ.get("GM_CORE_SOURCE"):
     sys.path.insert(0, os.environ["GM_CORE_SOURCE"])
 
-CORE_REVISION = "9e4d5c01e6ba7a22e73c17388796ec274f73a2fc"
-SDK_REVISION = "e554ca482a3ef4bc1e7a2ef205ac1d537daa169d"
-RUNTIME_VERSION = "1.8.1"
+# Each release tag with its commit on the next line, so the release train's Renovate preset moves both.
+CORE_RELEASE = "v1.9.2"  # GenesisMeshLabs/genesismesh
+CORE_REVISION = "0061e1f60f8d0495125d8f8e6210a66d3c8bab71"
+SDK_RELEASE = "v1.9.2"  # GenesisMeshLabs/sdk-rust
+SDK_REVISION = "ba9615118cc451c6e9eeced91e1d49f89e3935a2"
+RUNTIME_VERSION = CORE_RELEASE.removeprefix("v")
 MAX_BINARY_BYTES = 512 * 1024 * 1024
 
 

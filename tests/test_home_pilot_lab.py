@@ -44,11 +44,11 @@ def test_runtime_binary_has_exact_version_and_file_hash(tmp_path, monkeypatch):
 
     def run(args, **kwargs):
         calls.append((args, kwargs))
-        return subprocess.CompletedProcess(args, 0, stdout="genesis-mesh-edge 1.8.1\n")
+        return subprocess.CompletedProcess(args, 0, stdout=f"genesis-mesh-edge {lab.RUNTIME_VERSION}\n")
 
     monkeypatch.setattr(lab.subprocess, "run", run)
     assert lab.binary_info(binary, "genesis-mesh-edge") == {
-        "version": "genesis-mesh-edge 1.8.1",
+        "version": f"genesis-mesh-edge {lab.RUNTIME_VERSION}",
         "sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
     }
     assert calls[0][0] == [str(binary.resolve()), "--version"]
@@ -76,11 +76,11 @@ def test_runtime_binary_version_drift_and_empty_file_are_refused(tmp_path, monke
 def test_modified_or_unpinned_core_source_is_refused(tmp_path, monkeypatch, dirty, revision):
     package = tmp_path / "genesis_mesh"
     package.mkdir()
-    (tmp_path / "pyproject.toml").write_text('[project]\nname="genesis-mesh"\nversion="1.8.1"\n')
+    (tmp_path / "pyproject.toml").write_text(f'[project]\nname="genesis-mesh"\nversion="{lab.RUNTIME_VERSION}"\n')
     monkeypatch.setitem(
         sys.modules,
         "genesis_mesh",
-        SimpleNamespace(__file__=str(package / "__init__.py"), __version__="1.8.1"),
+        SimpleNamespace(__file__=str(package / "__init__.py"), __version__=lab.RUNTIME_VERSION),
     )
 
     def git_value(path, *args):

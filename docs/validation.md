@@ -33,8 +33,8 @@ checks are explicitly inapplicable on Windows, rather than claimed as passed the
 
 ## Real-service evidence
 
-- Core source: `1485b42e84a9e6b40240f3d366a492aca8aab44f` (1.8.1).
-- Rust SDK/edge/verifier source: `e554ca482a3ef4bc1e7a2ef205ac1d537daa169d` (1.8.1).
+- Core source: `0061e1f60f8d0495125d8f8e6210a66d3c8bab71` (1.9.2).
+- Rust SDK/edge/verifier source: `ba9615118cc451c6e9eeced91e1d49f89e3935a2` (1.9.2).
 - Disposable Network Authority, SQLite evidence store, freshly generated identities,
   authenticated Unix socket, and a newly built Linux edge agent/verifier.
 - Export: 19 entries; 4 decisions; 3 online execution records; 3 grant execution

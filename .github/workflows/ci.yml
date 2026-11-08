@@ -65,12 +65,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: GenesisMeshLabs/genesismesh
-          ref: 1485b42e84a9e6b40240f3d366a492aca8aab44f
+          ref: "0061e1f60f8d0495125d8f8e6210a66d3c8bab71"  # GenesisMeshLabs/genesismesh v1.9.2
           path: .upstream/core
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: GenesisMeshLabs/sdk-rust
-          ref: e554ca482a3ef4bc1e7a2ef205ac1d537daa169d
+          ref: "ba9615118cc451c6e9eeced91e1d49f89e3935a2"  # GenesisMeshLabs/sdk-rust v1.9.2
           path: .upstream/sdk-rust
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:

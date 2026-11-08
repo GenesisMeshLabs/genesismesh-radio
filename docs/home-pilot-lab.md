@@ -25,9 +25,9 @@ hashes are recorded, while build provenance is not independently attested.
 
 | Component | Required source/runtime |
 | --- | --- |
-| GenesisMesh core | `9e4d5c01e6ba7a22e73c17388796ec274f73a2fc`, version 1.8.1 |
-| SDK source for builds | `e554ca482a3ef4bc1e7a2ef205ac1d537daa169d` |
-| Edge / verifier executables | `genesis-mesh-edge 1.8.1` / `genesis-mesh-verify 1.8.1` |
+| GenesisMesh core | `0061e1f60f8d0495125d8f8e6210a66d3c8bab71`, version 1.9.2 |
+| SDK source for builds | `ba9615118cc451c6e9eeced91e1d49f89e3935a2` |
+| Edge / verifier executables | `genesis-mesh-edge 1.9.2` / `genesis-mesh-verify 1.9.2` |
 
 From the repository root:
 
