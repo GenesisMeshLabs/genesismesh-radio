@@ -27,10 +27,10 @@ if os.environ.get("GM_CORE_SOURCE"):
 
 # Each release tag with its commit on the next line,
 # so the release train's Renovate preset moves both.
-CORE_RELEASE = "v1.9.2"  # GenesisMeshLabs/genesismesh
-CORE_REVISION = "0061e1f60f8d0495125d8f8e6210a66d3c8bab71"
-SDK_RELEASE = "v1.9.2"  # GenesisMeshLabs/sdk-rust
-SDK_REVISION = "ba9615118cc451c6e9eeced91e1d49f89e3935a2"
+CORE_RELEASE = "v1.10.1"  # GenesisMeshLabs/genesismesh
+CORE_REVISION = "adc7d8a5040185c2f75fd8cff9d6e81f8e6296e7"
+SDK_RELEASE = "v1.10.1"  # GenesisMeshLabs/sdk-rust
+SDK_REVISION = "e4efc2f0419c0012e44cea2d280ec9908204ef72"
 RUNTIME_VERSION = CORE_RELEASE.removeprefix("v")
 MAX_BINARY_BYTES = 512 * 1024 * 1024
 

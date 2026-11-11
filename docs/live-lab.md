@@ -32,7 +32,7 @@ For example, in a dedicated environment:
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]' 'genesis-mesh==1.9.2'
+.venv/bin/python -m pip install -e '.[dev]' 'genesis-mesh==1.10.1'
 CARGO_TARGET_DIR=/tmp/gm-radio-target cargo build --locked \
   --manifest-path /path/to/sdk-rust/Cargo.toml -p genesis-mesh-edge -p genesis-mesh-verify
 CARGO_TARGET_DIR=/tmp/gm-radio-device-target cargo +1.99.0 build --locked \
